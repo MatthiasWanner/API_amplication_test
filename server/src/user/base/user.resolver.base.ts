@@ -292,27 +292,49 @@ export class UserResolverBase {
     return results.map((result) => permission.filter(result));
   }
 
+<<<<<<< HEAD
   @graphql.ResolveField(() => Profile, { nullable: true })
+=======
+  @graphql.ResolveField(() => [Profile])
+>>>>>>> main
   @nestAccessControl.UseRoles({
     resource: "User",
     action: "read",
     possession: "any",
   })
+<<<<<<< HEAD
   async profile(
     @graphql.Parent() parent: User,
     @gqlUserRoles.UserRoles() userRoles: string[]
   ): Promise<Profile | null> {
+=======
+  async profiles(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: ProfileFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Profile[]> {
+>>>>>>> main
     const permission = this.rolesBuilder.permission({
       role: userRoles,
       action: "read",
       possession: "any",
       resource: "Profile",
     });
+<<<<<<< HEAD
     const result = await this.service.getProfile(parent.id);
 
     if (!result) {
       return null;
     }
     return permission.filter(result);
+=======
+    const results = await this.service.findProfiles(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
+>>>>>>> main
   }
 }

@@ -1,7 +1,7 @@
-import { Album } from "../album/Album";
-import { Category } from "../category/Category";
-import { Picture } from "../picture/Picture";
-import { Profile } from "../profile/Profile";
+import { Album } from '../album/Album';
+import { Category } from '../category/Category';
+import { Picture } from '../picture/Picture';
+import { Profile } from '../profile/Profile';
 
 export type User = {
   albums?: Array<Album>;

@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 
 import {
   Show,
@@ -10,10 +10,10 @@ import {
   ReferenceManyField,
   Datagrid,
   BooleanField,
-} from "react-admin";
+} from 'react-admin';
 
-import { USER_TITLE_FIELD } from "./UserTitle";
-import { PROFILE_TITLE_FIELD } from "../profile/ProfileTitle";
+import { USER_TITLE_FIELD } from './UserTitle';
+import { PROFILE_TITLE_FIELD } from '../profile/ProfileTitle';
 
 export const UserShow = (props: ShowProps): React.ReactElement => {
   return (

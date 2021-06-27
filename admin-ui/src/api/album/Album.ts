@@ -1,6 +1,6 @@
-import { Category } from "../category/Category";
-import { Picture } from "../picture/Picture";
-import { User } from "../user/User";
+import { Category } from '../category/Category';
+import { Picture } from '../picture/Picture';
+import { User } from '../user/User';
 
 export type Album = {
   categories?: Array<Category>;

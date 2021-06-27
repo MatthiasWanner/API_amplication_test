@@ -1,4 +1,4 @@
-import { PrismaService } from "nestjs-prisma";
+import { PrismaService } from 'nestjs-prisma';
 import {
   Prisma,
   User,
@@ -6,9 +6,9 @@ import {
   Category,
   Picture,
   Profile,
-} from "@prisma/client";
-import { PasswordService } from "../../auth/password.service";
-import { transformStringFieldUpdateInput } from "../../prisma.util";
+} from '@prisma/client';
+import { PasswordService } from '../../auth/password.service';
+import { transformStringFieldUpdateInput } from '../../prisma.util';
 
 export class UserServiceBase {
   constructor(

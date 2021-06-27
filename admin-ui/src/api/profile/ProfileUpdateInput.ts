@@ -1,7 +1,7 @@
-import { UserWhereUniqueInput } from "../user/UserWhereUniqueInput";
+import { UserWhereUniqueInput } from '../user/UserWhereUniqueInput';
 
 export type ProfileUpdateInput = {
   avatarUrl?: string | null;
   description?: string | null;
-  user?: UserWhereUniqueInput;
+  user: UserWhereUniqueInput;
 };

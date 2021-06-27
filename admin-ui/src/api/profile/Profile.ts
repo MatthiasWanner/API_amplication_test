@@ -1,4 +1,4 @@
-import { User } from "../user/User";
+import { User } from '../user/User';
 
 export type Profile = {
   avatarUrl: string | null;
@@ -6,5 +6,5 @@ export type Profile = {
   description: string | null;
   id: string;
   updatedAt: Date;
-  user?: User;
+  user: User;
 };

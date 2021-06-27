@@ -1,11 +1,11 @@
-import { ObjectType, Field } from "@nestjs/graphql";
-import { ApiProperty } from "@nestjs/swagger";
-import { Album } from "../../album/base/Album";
-import { ValidateNested, IsOptional, IsDate, IsString } from "class-validator";
-import { Type } from "class-transformer";
-import { Category } from "../../category/base/Category";
-import { Picture } from "../../picture/base/Picture";
-import { Profile } from "../../profile/base/Profile";
+import { ObjectType, Field } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
+import { Album } from '../../album/base/Album';
+import { ValidateNested, IsOptional, IsDate, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { Category } from '../../category/base/Category';
+import { Picture } from '../../picture/base/Picture';
+import { Profile } from '../../profile/base/Profile';
 @ObjectType()
 class User {
   @ApiProperty({

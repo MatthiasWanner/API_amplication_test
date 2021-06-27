@@ -1,16 +1,16 @@
-import { ObjectType, Field } from "@nestjs/graphql";
-import { ApiProperty } from "@nestjs/swagger";
-import { Category } from "../../category/base/Category";
+import { ObjectType, Field } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
+import { Category } from '../../category/base/Category';
 import {
   ValidateNested,
   IsOptional,
   IsDate,
   IsString,
   IsBoolean,
-} from "class-validator";
-import { Type } from "class-transformer";
-import { Picture } from "../../picture/base/Picture";
-import { User } from "../../user/base/User";
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { Picture } from '../../picture/base/Picture';
+import { User } from '../../user/base/User';
 @ObjectType()
 class Album {
   @ApiProperty({
