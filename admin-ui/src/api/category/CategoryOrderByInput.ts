@@ -5,4 +5,5 @@ export type CategoryOrderByInput = {
   id?: SortOrder;
   name?: SortOrder;
   updatedAt?: SortOrder;
+  userId?: SortOrder;
 };

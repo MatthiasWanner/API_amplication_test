@@ -14,6 +14,7 @@ import { DeleteProfileArgs } from "./DeleteProfileArgs";
 import { ProfileFindManyArgs } from "./ProfileFindManyArgs";
 import { ProfileFindUniqueArgs } from "./ProfileFindUniqueArgs";
 import { Profile } from "./Profile";
+import { User } from "../../user/base/User";
 import { ProfileService } from "../profile.service";
 
 @graphql.Resolver(() => Profile)
@@ -120,7 +121,15 @@ export class ProfileResolverBase {
     // @ts-ignore
     return await this.service.create({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        user: args.data.user
+          ? {
+              connect: args.data.user,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -159,7 +168,15 @@ export class ProfileResolverBase {
       // @ts-ignore
       return await this.service.update({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          user: args.data.user
+            ? {
+                connect: args.data.user,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -191,5 +208,29 @@ export class ProfileResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => User, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "read",
+    possession: "any",
+  })
+  async user(
+    @graphql.Parent() parent: Profile,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<User | null> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "User",
+    });
+    const result = await this.service.getUser(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return permission.filter(result);
   }
 }

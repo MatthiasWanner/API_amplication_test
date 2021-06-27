@@ -1,9 +1,20 @@
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional } from "class-validator";
+import { Album } from "../../album/base/Album";
+import { ValidateNested, IsOptional, IsDate, IsString } from "class-validator";
 import { Type } from "class-transformer";
+import { User } from "../../user/base/User";
 @ObjectType()
 class Picture {
+  @ApiProperty({
+    required: false,
+    type: () => [Album],
+  })
+  @ValidateNested()
+  @Type(() => Album)
+  @IsOptional()
+  albums?: Array<Album>;
+
   @ApiProperty({
     required: true,
   })
@@ -54,5 +65,13 @@ class Picture {
   @IsString()
   @Field(() => String)
   url!: string;
+
+  @ApiProperty({
+    required: true,
+    type: () => User,
+  })
+  @ValidateNested()
+  @Type(() => User)
+  user?: User;
 }
 export { Picture };

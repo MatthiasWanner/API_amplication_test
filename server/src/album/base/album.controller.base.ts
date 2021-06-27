@@ -15,6 +15,10 @@ import { AlbumWhereUniqueInput } from "./AlbumWhereUniqueInput";
 import { AlbumFindManyArgs } from "./AlbumFindManyArgs";
 import { AlbumUpdateInput } from "./AlbumUpdateInput";
 import { Album } from "./Album";
+import { CategoryWhereInput } from "../../category/base/CategoryWhereInput";
+import { Category } from "../../category/base/Category";
+import { PictureWhereInput } from "../../picture/base/PictureWhereInput";
+import { Picture } from "../../picture/base/Picture";
 
 export class AlbumControllerBase {
   constructor(
@@ -55,13 +59,25 @@ export class AlbumControllerBase {
       );
     }
     return await this.service.create({
-      data: data,
+      data: {
+        ...data,
+
+        user: {
+          connect: data.user,
+        },
+      },
       select: {
         createdAt: true,
         id: true,
         published: true,
         title: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
   }
@@ -101,6 +117,12 @@ export class AlbumControllerBase {
         published: true,
         title: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     return results.map((result) => permission.filter(result));
@@ -135,6 +157,12 @@ export class AlbumControllerBase {
         published: true,
         title: true,
         updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -183,13 +211,25 @@ export class AlbumControllerBase {
     try {
       return await this.service.update({
         where: params,
-        data: data,
+        data: {
+          ...data,
+
+          user: {
+            connect: data.user,
+          },
+        },
         select: {
           createdAt: true,
           id: true,
           published: true,
           title: true,
           updatedAt: true,
+
+          user: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -225,6 +265,12 @@ export class AlbumControllerBase {
           published: true,
           title: true,
           updatedAt: true,
+
+          user: {
+            select: {
+              id: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -235,5 +281,345 @@ export class AlbumControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Get("/:id/categories")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiQuery({
+    type: () => CategoryWhereInput,
+    style: "deepObject",
+    explode: true,
+  })
+  async findManyCategories(
+    @common.Req() request: Request,
+    @common.Param() params: AlbumWhereUniqueInput,
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<Category[]> {
+    const query: CategoryWhereInput = request.query;
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Category",
+    });
+    const results = await this.service.findCategories(params.id, {
+      where: query,
+      select: {
+        createdAt: true,
+        id: true,
+        name: true,
+        updatedAt: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    return results.map((result) => permission.filter(result));
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Post("/:id/categories")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async createCategories(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      categories: {
+        connect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Patch("/:id/categories")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async updateCategories(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      categories: {
+        set: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Delete("/:id/categories")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async deleteCategories(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      categories: {
+        disconnect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Get("/:id/pictures")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiQuery({
+    type: () => PictureWhereInput,
+    style: "deepObject",
+    explode: true,
+  })
+  async findManyPictures(
+    @common.Req() request: Request,
+    @common.Param() params: AlbumWhereUniqueInput,
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<Picture[]> {
+    const query: PictureWhereInput = request.query;
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Picture",
+    });
+    const results = await this.service.findPictures(params.id, {
+      where: query,
+      select: {
+        createdAt: true,
+        description: true,
+        id: true,
+        title: true,
+        updatedAt: true,
+        url: true,
+
+        user: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+    return results.map((result) => permission.filter(result));
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Post("/:id/pictures")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async createPictures(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      pictures: {
+        connect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Patch("/:id/pictures")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async updatePictures(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      pictures: {
+        set: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Delete("/:id/pictures")
+  @nestAccessControl.UseRoles({
+    resource: "Album",
+    action: "update",
+    possession: "any",
+  })
+  async deletePictures(
+    @common.Param() params: AlbumWhereUniqueInput,
+    @common.Body() body: AlbumWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      pictures: {
+        disconnect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Album",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Album"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { PrismaService } from "nestjs-prisma";
-import { Prisma, Picture } from "@prisma/client";
+import { Prisma, Picture, Album, User } from "@prisma/client";
 
 export class PictureServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -34,5 +34,24 @@ export class PictureServiceBase {
     args: Prisma.SelectSubset<T, Prisma.PictureDeleteArgs>
   ): Promise<Picture> {
     return this.prisma.picture.delete(args);
+  }
+
+  async findAlbums(
+    parentId: string,
+    args: Prisma.AlbumFindManyArgs
+  ): Promise<Album[]> {
+    return this.prisma.picture
+      .findUnique({
+        where: { id: parentId },
+      })
+      .albums(args);
+  }
+
+  async getUser(parentId: string): Promise<User | null> {
+    return this.prisma.picture
+      .findUnique({
+        where: { id: parentId },
+      })
+      .user();
   }
 }
