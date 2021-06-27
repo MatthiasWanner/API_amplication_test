@@ -1,6 +1,13 @@
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsBoolean, IsOptional, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from "class-validator";
+import { UserWhereUniqueInput } from "../../user/base/UserWhereUniqueInput";
+import { Type } from "class-transformer";
 @InputType()
 class AlbumUpdateInput {
   @ApiProperty({
@@ -12,7 +19,7 @@ class AlbumUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  published?: boolean | null;
+  published?: boolean;
 
   @ApiProperty({
     required: false,
@@ -24,5 +31,17 @@ class AlbumUpdateInput {
     nullable: true,
   })
   title?: string;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserWhereUniqueInput,
+  })
+  @ValidateNested()
+  @Type(() => UserWhereUniqueInput)
+  @IsOptional()
+  @Field(() => UserWhereUniqueInput, {
+    nullable: true,
+  })
+  user?: UserWhereUniqueInput;
 }
 export { AlbumUpdateInput };

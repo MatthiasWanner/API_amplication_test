@@ -1,7 +1,14 @@
+import { Category } from "../category/Category";
+import { Picture } from "../picture/Picture";
+import { User } from "../user/User";
+
 export type Album = {
+  categories?: Array<Category>;
   createdAt: Date;
   id: string;
-  published: boolean | null;
+  pictures?: Array<Picture>;
+  published: boolean;
   title: string;
   updatedAt: Date;
+  user?: User;
 };

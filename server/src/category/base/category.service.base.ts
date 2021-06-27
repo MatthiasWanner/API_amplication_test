@@ -1,5 +1,5 @@
 import { PrismaService } from "nestjs-prisma";
-import { Prisma, Category } from "@prisma/client";
+import { Prisma, Category, Album, User } from "@prisma/client";
 
 export class CategoryServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -34,5 +34,24 @@ export class CategoryServiceBase {
     args: Prisma.SelectSubset<T, Prisma.CategoryDeleteArgs>
   ): Promise<Category> {
     return this.prisma.category.delete(args);
+  }
+
+  async findAlbums(
+    parentId: string,
+    args: Prisma.AlbumFindManyArgs
+  ): Promise<Album[]> {
+    return this.prisma.category
+      .findUnique({
+        where: { id: parentId },
+      })
+      .albums(args);
+  }
+
+  async getUser(parentId: string): Promise<User | null> {
+    return this.prisma.category
+      .findUnique({
+        where: { id: parentId },
+      })
+      .user();
   }
 }

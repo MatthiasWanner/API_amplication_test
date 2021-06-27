@@ -8,14 +8,20 @@ generator client {
 }
 
 model User {
-  createdAt DateTime @default(now())
-  firstName String?
-  id        String   @id @default(cuid())
-  lastName  String?
-  password  String
-  roles     String[]
-  updatedAt DateTime @updatedAt
-  username  String   @unique
+  albums     Album[]
+  categories Category[]
+  createdAt  DateTime   @default(now())
+  email      String
+  firstName  String?
+  id         String     @id @default(cuid())
+  lastName   String?
+  password   String
+  pictures   Picture[]
+  profile    Profile?   @relation(fields: [profileId], references: [id])
+  profileId  String?
+  roles      String[]
+  updatedAt  DateTime   @updatedAt
+  username   String     @unique
 }
 
 model Profile {
@@ -24,28 +30,39 @@ model Profile {
   description String?
   id          String   @id @default(cuid())
   updatedAt   DateTime @updatedAt
+  user        User
 }
 
 model Album {
-  createdAt DateTime @default(now())
-  id        String   @id @default(cuid())
-  published Boolean?
-  title     String
-  updatedAt DateTime @updatedAt
+  categories Category[]
+  createdAt  DateTime   @default(now())
+  id         String     @id @default(cuid())
+  pictures   Picture[]
+  published  Boolean
+  title      String
+  updatedAt  DateTime   @updatedAt
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
 }
 
 model Picture {
+  albums      Album[]
   createdAt   DateTime @default(now())
   description String?
   id          String   @id @default(cuid())
   title       String
   updatedAt   DateTime @updatedAt
   url         String
+  user        User     @relation(fields: [userId], references: [id])
+  userId      String
 }
 
 model Category {
+  albums    Album[]
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   name      String
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
 }

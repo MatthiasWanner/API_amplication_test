@@ -1,5 +1,5 @@
 import { PrismaService } from "nestjs-prisma";
-import { Prisma, Profile } from "@prisma/client";
+import { Prisma, Profile, User } from "@prisma/client";
 
 export class ProfileServiceBase {
   constructor(protected readonly prisma: PrismaService) {}
@@ -34,5 +34,13 @@ export class ProfileServiceBase {
     args: Prisma.SelectSubset<T, Prisma.ProfileDeleteArgs>
   ): Promise<Profile> {
     return this.prisma.profile.delete(args);
+  }
+
+  async getUser(parentId: string): Promise<User | null> {
+    return this.prisma.profile
+      .findUnique({
+        where: { id: parentId },
+      })
+      .user();
   }
 }

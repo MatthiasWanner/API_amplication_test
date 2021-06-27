@@ -60,6 +60,15 @@ class PictureOrderByInput {
     nullable: true,
   })
   url?: SortOrder;
+
+  @ApiProperty({
+    required: false,
+    enum: ["Asc", "Desc"],
+  })
+  @Field(() => SortOrder, {
+    nullable: true,
+  })
+  userId?: SortOrder;
 }
 
 export { PictureOrderByInput };
