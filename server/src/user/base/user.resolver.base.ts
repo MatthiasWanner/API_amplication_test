@@ -20,7 +20,6 @@ import { CategoryFindManyArgs } from "../../category/base/CategoryFindManyArgs";
 import { Category } from "../../category/base/Category";
 import { PictureFindManyArgs } from "../../picture/base/PictureFindManyArgs";
 import { Picture } from "../../picture/base/Picture";
-import { ProfileFindManyArgs } from "../../profile/base/ProfileFindManyArgs";
 import { Profile } from "../../profile/base/Profile";
 import { UserService } from "../user.service";
 
@@ -128,7 +127,15 @@ export class UserResolverBase {
     // @ts-ignore
     return await this.service.create({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        profile: args.data.profile
+          ? {
+              connect: args.data.profile,
+            }
+          : undefined,
+      },
     });
   }
 
@@ -167,7 +174,15 @@ export class UserResolverBase {
       // @ts-ignore
       return await this.service.update({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          profile: args.data.profile
+            ? {
+                connect: args.data.profile,
+              }
+            : undefined,
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -277,29 +292,27 @@ export class UserResolverBase {
     return results.map((result) => permission.filter(result));
   }
 
-  @graphql.ResolveField(() => [Profile])
+  @graphql.ResolveField(() => Profile, { nullable: true })
   @nestAccessControl.UseRoles({
     resource: "User",
     action: "read",
     possession: "any",
   })
-  async profiles(
+  async profile(
     @graphql.Parent() parent: User,
-    @graphql.Args() args: ProfileFindManyArgs,
     @gqlUserRoles.UserRoles() userRoles: string[]
-  ): Promise<Profile[]> {
+  ): Promise<Profile | null> {
     const permission = this.rolesBuilder.permission({
       role: userRoles,
       action: "read",
       possession: "any",
       resource: "Profile",
     });
-    const results = await this.service.findProfiles(parent.id, args);
+    const result = await this.service.getProfile(parent.id);
 
-    if (!results) {
-      return [];
+    if (!result) {
+      return null;
     }
-
-    return results.map((result) => permission.filter(result));
+    return permission.filter(result);
   }
 }

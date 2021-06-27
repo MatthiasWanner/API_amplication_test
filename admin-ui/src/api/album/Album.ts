@@ -7,7 +7,7 @@ export type Album = {
   createdAt: Date;
   id: string;
   pictures?: Array<Picture>;
-  published: boolean | null;
+  published: boolean;
   title: string;
   updatedAt: Date;
   user?: User;

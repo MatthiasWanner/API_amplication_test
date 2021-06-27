@@ -58,6 +58,6 @@ class Profile {
   @ValidateNested()
   @Type(() => User)
   @IsOptional()
-  user?: User | null;
+  user?: User;
 }
 export { Profile };

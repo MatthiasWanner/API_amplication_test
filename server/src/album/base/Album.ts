@@ -48,15 +48,12 @@ class Album {
   pictures?: Array<Picture>;
 
   @ApiProperty({
-    required: false,
+    required: true,
     type: Boolean,
   })
   @IsBoolean()
-  @IsOptional()
-  @Field(() => Boolean, {
-    nullable: true,
-  })
-  published!: boolean | null;
+  @Field(() => Boolean)
+  published!: boolean;
 
   @ApiProperty({
     required: true,

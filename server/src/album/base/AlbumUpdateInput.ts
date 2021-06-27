@@ -19,7 +19,7 @@ class AlbumUpdateInput {
   @Field(() => Boolean, {
     nullable: true,
   })
-  published?: boolean | null;
+  published?: boolean;
 
   @ApiProperty({
     required: false,

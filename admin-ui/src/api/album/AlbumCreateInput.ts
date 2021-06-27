@@ -1,7 +1,7 @@
 import { UserWhereUniqueInput } from "../user/UserWhereUniqueInput";
 
 export type AlbumCreateInput = {
-  published?: boolean | null;
+  published: boolean;
   title: string;
   user: UserWhereUniqueInput;
 };

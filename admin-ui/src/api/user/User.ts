@@ -7,11 +7,12 @@ export type User = {
   albums?: Array<Album>;
   categories?: Array<Category>;
   createdAt: Date;
+  email: string;
   firstName: string | null;
   id: string;
   lastName: string | null;
   pictures?: Array<Picture>;
-  profiles?: Array<Profile>;
+  profile?: Profile | null;
   roles: Array<string>;
   updatedAt: Date;
   username: string;

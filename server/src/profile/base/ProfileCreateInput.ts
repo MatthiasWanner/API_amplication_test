@@ -37,6 +37,6 @@ class ProfileCreateInput {
   @Field(() => UserWhereUniqueInput, {
     nullable: true,
   })
-  user?: UserWhereUniqueInput | null;
+  user?: UserWhereUniqueInput;
 }
 export { ProfileCreateInput };
