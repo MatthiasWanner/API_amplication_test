@@ -14,6 +14,14 @@ import { DeleteUserArgs } from "./DeleteUserArgs";
 import { UserFindManyArgs } from "./UserFindManyArgs";
 import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
 import { User } from "./User";
+import { AlbumFindManyArgs } from "../../album/base/AlbumFindManyArgs";
+import { Album } from "../../album/base/Album";
+import { CategoryFindManyArgs } from "../../category/base/CategoryFindManyArgs";
+import { Category } from "../../category/base/Category";
+import { PictureFindManyArgs } from "../../picture/base/PictureFindManyArgs";
+import { Picture } from "../../picture/base/Picture";
+import { ProfileFindManyArgs } from "../../profile/base/ProfileFindManyArgs";
+import { Profile } from "../../profile/base/Profile";
 import { UserService } from "../user.service";
 
 @graphql.Resolver(() => User)
@@ -189,5 +197,109 @@ export class UserResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [Album])
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async albums(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: AlbumFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Album[]> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Album",
+    });
+    const results = await this.service.findAlbums(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
+  }
+
+  @graphql.ResolveField(() => [Category])
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async categories(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: CategoryFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Category[]> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Category",
+    });
+    const results = await this.service.findCategories(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
+  }
+
+  @graphql.ResolveField(() => [Picture])
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async pictures(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: PictureFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Picture[]> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Picture",
+    });
+    const results = await this.service.findPictures(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
+  }
+
+  @graphql.ResolveField(() => [Profile])
+  @nestAccessControl.UseRoles({
+    resource: "User",
+    action: "read",
+    possession: "any",
+  })
+  async profiles(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: ProfileFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Profile[]> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Profile",
+    });
+    const results = await this.service.findProfiles(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
   }
 }

@@ -1,5 +1,12 @@
 import { PrismaService } from "nestjs-prisma";
-import { Prisma, User } from "@prisma/client";
+import {
+  Prisma,
+  User,
+  Album,
+  Category,
+  Picture,
+  Profile,
+} from "@prisma/client";
 import { PasswordService } from "../../auth/password.service";
 import { transformStringFieldUpdateInput } from "../../prisma.util";
 
@@ -59,5 +66,49 @@ export class UserServiceBase {
     args: Prisma.SelectSubset<T, Prisma.UserDeleteArgs>
   ): Promise<User> {
     return this.prisma.user.delete(args);
+  }
+
+  async findAlbums(
+    parentId: string,
+    args: Prisma.AlbumFindManyArgs
+  ): Promise<Album[]> {
+    return this.prisma.user
+      .findUnique({
+        where: { id: parentId },
+      })
+      .albums(args);
+  }
+
+  async findCategories(
+    parentId: string,
+    args: Prisma.CategoryFindManyArgs
+  ): Promise<Category[]> {
+    return this.prisma.user
+      .findUnique({
+        where: { id: parentId },
+      })
+      .categories(args);
+  }
+
+  async findPictures(
+    parentId: string,
+    args: Prisma.PictureFindManyArgs
+  ): Promise<Picture[]> {
+    return this.prisma.user
+      .findUnique({
+        where: { id: parentId },
+      })
+      .pictures(args);
+  }
+
+  async findProfiles(
+    parentId: string,
+    args: Prisma.ProfileFindManyArgs
+  ): Promise<Profile[]> {
+    return this.prisma.user
+      .findUnique({
+        where: { id: parentId },
+      })
+      .profiles(args);
   }
 }

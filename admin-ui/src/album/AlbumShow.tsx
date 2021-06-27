@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
   Show,
   SimpleShowLayout,
@@ -6,7 +7,10 @@ import {
   DateField,
   TextField,
   BooleanField,
+  ReferenceField,
 } from "react-admin";
+
+import { USER_TITLE_FIELD } from "../user/UserTitle";
 
 export const AlbumShow = (props: ShowProps): React.ReactElement => {
   return (
@@ -17,6 +21,9 @@ export const AlbumShow = (props: ShowProps): React.ReactElement => {
         <BooleanField label="Published" source="published" />
         <TextField label="Title" source="title" />
         <DateField source="updatedAt" label="Updated At" />
+        <ReferenceField label="User" source="user.id" reference="User">
+          <TextField source={USER_TITLE_FIELD} />
+        </ReferenceField>
       </SimpleShowLayout>
     </Show>
   );

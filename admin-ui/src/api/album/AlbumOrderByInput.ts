@@ -6,4 +6,5 @@ export type AlbumOrderByInput = {
   published?: SortOrder;
   title?: SortOrder;
   updatedAt?: SortOrder;
+  userId?: SortOrder;
 };

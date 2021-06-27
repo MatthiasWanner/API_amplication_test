@@ -14,6 +14,9 @@ import { DeleteCategoryArgs } from "./DeleteCategoryArgs";
 import { CategoryFindManyArgs } from "./CategoryFindManyArgs";
 import { CategoryFindUniqueArgs } from "./CategoryFindUniqueArgs";
 import { Category } from "./Category";
+import { AlbumFindManyArgs } from "../../album/base/AlbumFindManyArgs";
+import { Album } from "../../album/base/Album";
+import { User } from "../../user/base/User";
 import { CategoryService } from "../category.service";
 
 @graphql.Resolver(() => Category)
@@ -120,7 +123,13 @@ export class CategoryResolverBase {
     // @ts-ignore
     return await this.service.create({
       ...args,
-      data: args.data,
+      data: {
+        ...args.data,
+
+        user: {
+          connect: args.data.user,
+        },
+      },
     });
   }
 
@@ -159,7 +168,13 @@ export class CategoryResolverBase {
       // @ts-ignore
       return await this.service.update({
         ...args,
-        data: args.data,
+        data: {
+          ...args.data,
+
+          user: {
+            connect: args.data.user,
+          },
+        },
       });
     } catch (error) {
       if (isRecordNotFoundError(error)) {
@@ -191,5 +206,55 @@ export class CategoryResolverBase {
       }
       throw error;
     }
+  }
+
+  @graphql.ResolveField(() => [Album])
+  @nestAccessControl.UseRoles({
+    resource: "Category",
+    action: "read",
+    possession: "any",
+  })
+  async albums(
+    @graphql.Parent() parent: Category,
+    @graphql.Args() args: AlbumFindManyArgs,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<Album[]> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "Album",
+    });
+    const results = await this.service.findAlbums(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results.map((result) => permission.filter(result));
+  }
+
+  @graphql.ResolveField(() => User, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "Category",
+    action: "read",
+    possession: "any",
+  })
+  async user(
+    @graphql.Parent() parent: Category,
+    @gqlUserRoles.UserRoles() userRoles: string[]
+  ): Promise<User | null> {
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "User",
+    });
+    const result = await this.service.getUser(parent.id);
+
+    if (!result) {
+      return null;
+    }
+    return permission.filter(result);
   }
 }

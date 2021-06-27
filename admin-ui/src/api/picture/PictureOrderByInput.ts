@@ -7,4 +7,5 @@ export type PictureOrderByInput = {
   title?: SortOrder;
   updatedAt?: SortOrder;
   url?: SortOrder;
+  userId?: SortOrder;
 };
