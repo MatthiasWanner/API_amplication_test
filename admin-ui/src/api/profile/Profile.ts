@@ -6,5 +6,5 @@ export type Profile = {
   description: string | null;
   id: string;
   updatedAt: Date;
-  user?: User | null;
+  user?: User;
 };

@@ -101,14 +101,11 @@ export class UserServiceBase {
       .pictures(args);
   }
 
-  async findProfiles(
-    parentId: string,
-    args: Prisma.ProfileFindManyArgs
-  ): Promise<Profile[]> {
+  async getProfile(parentId: string): Promise<Profile | null> {
     return this.prisma.user
       .findUnique({
         where: { id: parentId },
       })
-      .profiles(args);
+      .profile();
   }
 }

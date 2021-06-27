@@ -35,6 +35,14 @@ class User {
   createdAt!: Date;
 
   @ApiProperty({
+    required: true,
+    type: String,
+  })
+  @IsString()
+  @Field(() => String)
+  email!: string;
+
+  @ApiProperty({
     required: false,
     type: String,
   })
@@ -75,12 +83,12 @@ class User {
 
   @ApiProperty({
     required: false,
-    type: () => [Profile],
+    type: () => Profile,
   })
   @ValidateNested()
   @Type(() => Profile)
   @IsOptional()
-  profiles?: Array<Profile>;
+  profile?: Profile | null;
 
   @ApiProperty({
     required: true,

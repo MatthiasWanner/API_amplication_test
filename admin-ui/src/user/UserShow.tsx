@@ -6,22 +6,27 @@ import {
   ShowProps,
   DateField,
   TextField,
+  ReferenceField,
   ReferenceManyField,
   Datagrid,
   BooleanField,
-  ReferenceField,
 } from "react-admin";
 
 import { USER_TITLE_FIELD } from "./UserTitle";
+import { PROFILE_TITLE_FIELD } from "../profile/ProfileTitle";
 
 export const UserShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
         <DateField source="createdAt" label="Created At" />
+        <TextField label="email" source="email" />
         <TextField label="First Name" source="firstName" />
         <TextField label="ID" source="id" />
         <TextField label="Last Name" source="lastName" />
+        <ReferenceField label="Profile" source="profile.id" reference="Profile">
+          <TextField source={PROFILE_TITLE_FIELD} />
+        </ReferenceField>
         <TextField label="Roles" source="roles" />
         <DateField source="updatedAt" label="Updated At" />
         <TextField label="Username" source="username" />
@@ -65,22 +70,6 @@ export const UserShow = (props: ShowProps): React.ReactElement => {
             <DateField source="updatedAt" label="Updated At" />
             <TextField label="url" source="url" />
             <ReferenceField label="user" source="user.id" reference="User">
-              <TextField source={USER_TITLE_FIELD} />
-            </ReferenceField>
-          </Datagrid>
-        </ReferenceManyField>
-        <ReferenceManyField
-          reference="Profile"
-          target="UserId"
-          label="Profiles"
-        >
-          <Datagrid rowClick="show">
-            <TextField label="Avatar_url" source="avatarUrl" />
-            <DateField source="createdAt" label="Created At" />
-            <TextField label="Description" source="description" />
-            <TextField label="ID" source="id" />
-            <DateField source="updatedAt" label="Updated At" />
-            <ReferenceField label="User" source="user.id" reference="User">
               <TextField source={USER_TITLE_FIELD} />
             </ReferenceField>
           </Datagrid>
