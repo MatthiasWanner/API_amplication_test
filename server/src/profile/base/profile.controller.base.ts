@@ -15,6 +15,8 @@ import { ProfileWhereUniqueInput } from "./ProfileWhereUniqueInput";
 import { ProfileFindManyArgs } from "./ProfileFindManyArgs";
 import { ProfileUpdateInput } from "./ProfileUpdateInput";
 import { Profile } from "./Profile";
+import { UserWhereInput } from "../../user/base/UserWhereInput";
+import { User } from "../../user/base/User";
 
 export class ProfileControllerBase {
   constructor(
@@ -55,27 +57,13 @@ export class ProfileControllerBase {
       );
     }
     return await this.service.create({
-      data: {
-        ...data,
-
-        user: data.user
-          ? {
-              connect: data.user,
-            }
-          : undefined,
-      },
+      data: data,
       select: {
         avatarUrl: true,
         createdAt: true,
         description: true,
         id: true,
         updatedAt: true,
-
-        user: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
   }
@@ -115,12 +103,6 @@ export class ProfileControllerBase {
         description: true,
         id: true,
         updatedAt: true,
-
-        user: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     return results.map((result) => permission.filter(result));
@@ -155,12 +137,6 @@ export class ProfileControllerBase {
         description: true,
         id: true,
         updatedAt: true,
-
-        user: {
-          select: {
-            id: true,
-          },
-        },
       },
     });
     if (result === null) {
@@ -209,27 +185,13 @@ export class ProfileControllerBase {
     try {
       return await this.service.update({
         where: params,
-        data: {
-          ...data,
-
-          user: data.user
-            ? {
-                connect: data.user,
-              }
-            : undefined,
-        },
+        data: data,
         select: {
           avatarUrl: true,
           createdAt: true,
           description: true,
           id: true,
           updatedAt: true,
-
-          user: {
-            select: {
-              id: true,
-            },
-          },
         },
       });
     } catch (error) {
@@ -265,12 +227,6 @@ export class ProfileControllerBase {
           description: true,
           id: true,
           updatedAt: true,
-
-          user: {
-            select: {
-              id: true,
-            },
-          },
         },
       });
     } catch (error) {
@@ -281,5 +237,179 @@ export class ProfileControllerBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Get("/:id/user")
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiQuery({
+    type: () => UserWhereInput,
+    style: "deepObject",
+    explode: true,
+  })
+  async findManyUser(
+    @common.Req() request: Request,
+    @common.Param() params: ProfileWhereUniqueInput,
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<User[]> {
+    const query: UserWhereInput = request.query;
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "read",
+      possession: "any",
+      resource: "User",
+    });
+    const results = await this.service.findUser(params.id, {
+      where: query,
+      select: {
+        createdAt: true,
+        email: true,
+        firstName: true,
+        id: true,
+        lastName: true,
+
+        profile: {
+          select: {
+            id: true,
+          },
+        },
+
+        roles: true,
+        updatedAt: true,
+        username: true,
+      },
+    });
+    return results.map((result) => permission.filter(result));
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Post("/:id/user")
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "update",
+    possession: "any",
+  })
+  async createUser(
+    @common.Param() params: ProfileWhereUniqueInput,
+    @common.Body() body: ProfileWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      user: {
+        connect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Profile",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Profile"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Patch("/:id/user")
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "update",
+    possession: "any",
+  })
+  async updateUser(
+    @common.Param() params: ProfileWhereUniqueInput,
+    @common.Body() body: ProfileWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      user: {
+        set: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Profile",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Profile"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
+  }
+
+  @common.UseInterceptors(nestMorgan.MorganInterceptor("combined"))
+  @common.UseGuards(basicAuthGuard.BasicAuthGuard, nestAccessControl.ACGuard)
+  @common.Delete("/:id/user")
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "update",
+    possession: "any",
+  })
+  async deleteUser(
+    @common.Param() params: ProfileWhereUniqueInput,
+    @common.Body() body: ProfileWhereUniqueInput[],
+    @nestAccessControl.UserRoles() userRoles: string[]
+  ): Promise<void> {
+    const data = {
+      user: {
+        disconnect: body,
+      },
+    };
+    const permission = this.rolesBuilder.permission({
+      role: userRoles,
+      action: "update",
+      possession: "any",
+      resource: "Profile",
+    });
+    const invalidAttributes = abacUtil.getInvalidAttributes(permission, data);
+    if (invalidAttributes.length) {
+      const roles = userRoles
+        .map((role: string) => JSON.stringify(role))
+        .join(",");
+      throw new common.ForbiddenException(
+        `Updating the relationship: ${
+          invalidAttributes[0]
+        } of ${"Profile"} is forbidden for roles: ${roles}`
+      );
+    }
+    await this.service.update({
+      where: params,
+      data,
+      select: { id: true },
+    });
   }
 }

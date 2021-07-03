@@ -53,11 +53,11 @@ class Profile {
 
   @ApiProperty({
     required: false,
-    type: () => User,
+    type: () => [User],
   })
   @ValidateNested()
   @Type(() => User)
   @IsOptional()
-  user?: User;
+  user?: Array<User>;
 }
 export { Profile };
