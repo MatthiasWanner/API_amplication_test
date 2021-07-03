@@ -30,7 +30,7 @@ model Profile {
   description String?
   id          String   @id @default(cuid())
   updatedAt   DateTime @updatedAt
-  user        User
+  user        User[]
 }
 
 model Album {

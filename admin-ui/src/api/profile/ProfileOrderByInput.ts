@@ -6,5 +6,4 @@ export type ProfileOrderByInput = {
   description?: SortOrder;
   id?: SortOrder;
   updatedAt?: SortOrder;
-  userId?: SortOrder;
 };
